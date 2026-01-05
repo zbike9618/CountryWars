@@ -25,7 +25,7 @@
             ],
             "uuid": "37dc5294-4786-490e-9d01-de262dfcb6a9",
             "language": "javascript",
-            "entry": "scripts/index.js"
+            "entry": "scripts/main.js"
         }
     ],
     "dependencies": [

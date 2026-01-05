@@ -1,0 +1,23 @@
+{
+  "name": "countrywars",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/zbike9618/CountryWars#readme",
+  "bugs": {
+    "url": "https://github.com/zbike9618/CountryWars/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zbike9618/CountryWars.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@minecraft/server": "^2.5.0-beta.1.21.130-stable"
+  }
+}
