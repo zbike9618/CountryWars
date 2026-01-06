@@ -20,6 +20,11 @@ world.afterEvents.playerSpawn.subscribe(ev => {
     }
 })
 
+world.afterEvents.playerLeave.subscribe(ev => {
+    const playerId = ev.playerId;
+    shortPlayerDatas.delete(playerId)
+})
+
 function DoInitialSpawn(player) {
     player.sendMessage({ translate: "cw.initialSpawn" })
 }
