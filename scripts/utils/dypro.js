@@ -14,7 +14,11 @@ export class Dypro {
         this.name = name;
     }
     get idList() {
-        return world.getDynamicPropertyIds().filter(id => id.startsWith(`${this.name}#`))
+        const idList = []
+        for (const data of world.getDynamicPropertyIds().filter(id => id.startsWith(`${this.name}#`))) {
+            idList.push(data.replace(`${this.name}#`, ""))
+        }
+        return idList
     }
     set(path, data) {
         //includes"_" set
