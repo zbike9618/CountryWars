@@ -17,8 +17,20 @@ system.beforeEvents.startup.subscribe(ev => {
         optionalParameters: [
         ],
     }
+    const scommand = {
+        name: "cw:mc", // コマンド名
+        description: "建国する", // コマンド説明
+        permissionLevel: server.CommandPermissionLevel.Any, // 権限レベル: ope
+        // 必須の引数
+        mandatoryParameters: [
+        ], // なし
+        // 引数
+        optionalParameters: [
+        ],
+    }
 
     ev.customCommandRegistry.registerCommand(command, DoCommand);
+    ev.customCommandRegistry.registerCommand(scommand, DoCommand);
 });
 
 function DoCommand(origin) {

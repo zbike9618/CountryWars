@@ -23,3 +23,19 @@ world.afterEvents.playerSpawn.subscribe(ev => {
 function DoInitialSpawn(player) {
     player.sendMessage({ translate: "cw.initialSpawn" })
 }
+const shortPlayerDatas = new Map();
+export class ShortPlayerData {
+    constructor(playerId) {
+        this.id = playerId
+    }
+    set(key, data) {
+        const d = Object.assign(shortPlayerDatas.get(this.id) || {}, { [key]: data })
+        shortPlayerDatas.set(this.id, d)
+    }
+    get(key) {
+        return shortPlayerDatas.get(this.id)[key]
+    }
+    remove() {
+        shortPlayerDatas.delete(this.id)
+    }
+}
