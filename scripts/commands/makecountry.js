@@ -33,7 +33,7 @@ function DoCommand(origin) {
 
     const player = origin.sourceEntity;
     //関数を実行する
-    MakeCountry.make(player);
+    MakeCountry.makeForm(player);
 
 
 

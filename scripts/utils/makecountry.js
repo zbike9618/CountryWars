@@ -2,6 +2,7 @@ import * as server from "@minecraft/server"
 const { world, system } = server;
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui"
 import { Util } from "./util.js";
+import { Dypro } from "./dypro.js";
 const countryDatas = new Dypro("country");
 export class MakeCountry {
 
@@ -12,7 +13,7 @@ export class MakeCountry {
         form.toggle({ translate: "cw.mcform.toggle" }, { defaultValue: false, tooltip: { translate: "cw.mcform.toggleTooltip" } })//平和主義か
         const res = await form.show(player)
         if (res.canceled) return;
-        make(player, res.formValues)
+        this.make(player, res.formValues)
 
     }
     //constructurはなし
@@ -25,12 +26,18 @@ export class MakeCountry {
         const countryData =
         {
             name: countryName,
+            description: "",
             money: 0,
+            tax: 0,//税率[%]
             isPeace: isPeace,
+            players: [player.id],
+            PlayerPermission: { "国王": [player.id] },
+            permissions: { "国王": [] },
+            //同盟国などはあとで
 
         }
-        const id = countryDatas.idList.length + 1;
-        countryDatas.set(id, countryData);
+        const Id = countryDatas.idList.length + 1;
+        countryDatas.set(Id, countryData);
     }
 
 }
