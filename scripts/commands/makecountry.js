@@ -38,20 +38,22 @@ function DoCommand(origin) {
     if (origin.sourceEntity?.typeId !== "minecraft:player") {
         // コマンド結果を返す
         return {
-            status: CustomCommandStatus.Failure, // 失敗
+            status: server.CustomCommandStatus.Failure, // 失敗
             message: "実行者はプレイヤーである必要があります",
         }
     }
 
     const player = origin.sourceEntity;
     //関数を実行する
-    MakeCountry.makeForm(player);
+    system.run(() => {
+        MakeCountry.makeForm(player);
+    })
 
 
 
     // コマンド結果を返す
     return {
-        status: CustomCommandStatus.Success, // 成功
+        status: server.CustomCommandStatus.Success, // 成功
         message: undefined, // メッセージなし
     }
 }
