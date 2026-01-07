@@ -10,6 +10,7 @@ world.afterEvents.playerSpawn.subscribe(ev => {
     if (initialSpawn) {
         const playerData =
         {
+            id: player.id,
             name: player.name,
             country: undefined,
             money: 0,
@@ -38,9 +39,21 @@ export class ShortPlayerData {
         shortPlayerDatas.set(this.id, d)
     }
     get(key) {
-        return shortPlayerDatas.get(this.id)[key]
+        const getData = shortPlayerDatas.get(this.id)
+        return getData ? getData[key] : undefined;
     }
-    remove() {
+    remove(key, secondkey = undefined) {
+        if (secondkey) {
+            const getData = shortPlayerDatas.get(this.id)
+            if (getData) {
+                delete getData[key][secondkey]
+            }
+        }
+        else {
+            shortPlayerDatas.delete(this.id)
+        }
+    }
+    clear() {
         shortPlayerDatas.delete(this.id)
     }
 }

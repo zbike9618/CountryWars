@@ -44,19 +44,21 @@ function DoCommand(origin, selector) {
     if (origin.sourceEntity?.typeId !== "minecraft:player") {
         // コマンド結果を返す
         return {
-            status: CustomCommandStatus.Failure, // 失敗
+            status: server.CustomCommandStatus.Failure, // 失敗
             message: "実行者はプレイヤーである必要があります",
         }
     }
     const player = origin.sourceEntity;
-    const target = selector[0];
-    //関数を実行する
-    tpaccept(player, target);
+    const target = selector ? selector[0] : undefined
+    //関数を実行する（制限された実行コンテキストから抜けるためsystem.run()を使用）
+    system.run(() => {
+        tpaccept(player, target);
+    });
 
 
     // コマンド結果を返す
     return {
-        status: CustomCommandStatus.Success, // 成功
+        status: server.CustomCommandStatus.Success, // 成功
         message: undefined, // メッセージなし
     }
 }
@@ -78,7 +80,7 @@ async function tpaForm(player) {
     const playerData = new ShortPlayerData(player.id)
     form.title({ translate: "cw.tpaform.title" })
     form.button({ translate: "cw.tpaform.accept" })
-    form.button({ translate: "cw.tpaform.recieve", with: [playerData.get("tpa").length || 0] })
+    form.button({ translate: "cw.tpaform.recieve", with: [`${(playerData.get("tpa") || []).length}`] })
     const res = await form.show(player)
     if (res.canceled) return;
     if (res.selection == 0) {
@@ -88,33 +90,66 @@ async function tpaForm(player) {
         tpaRecieve(player)
     }
 }
+/**
+ * 
+ * @param {import("@minecraft/server").Player} player 
+ */
 async function tpaRecieve(player) {
+    const playerData = new ShortPlayerData(player.id)
     const form = new ActionFormData()
-    form.title({ translate: "cw.tpaform.recieve", with: [playerData.get("tpa").length || 0] })
-    for (const playerId of ShortPlayerData(player.id).get("tpa")) {
+    const tpaArray = playerData.get("tpa")
+    if (!tpaArray) {
+        const mform = new MessageFormData()
+        mform.title({ translate: "cw.tpaform.recieve", with: [`0`] })
+        mform.body({ translate: "cw.tpaformR.nobodyAccept" })
+        mform.button1({ translate: "cw.form.redo" })
+        mform.button2({ translate: "cw.form.cancel" })
+        const respone = await mform.show(player)
+        if (respone.canceled) return;
+        if (respone.selection == 0) {
+            tpaForm(player)
+        }
+        return;
+    }
+    form.title({ translate: "cw.tpaform.recieve", with: [`${tpaArray.length}`] })
+    for (const playerId of tpaArray) {
         const playerData = playerDatas.get(playerId)
         form.button(playerData.name)
     }
     const res = await form.show(player)
     if (res.canceled) return;
-    const playerId = ShortPlayerData(player.id).get("tpa")[res.selection]
+    const playerId = tpaArray[res.selection]
     const target = playerDatas.get(playerId);
     const mform = new MessageFormData()
-    mform.title({ translate: "cw.tpaform.recieve", with: [playerData.get("tpa").length || 0] })
+    mform.title({ translate: "cw.tpaform.recieve", with: [`0`] })
     mform.body({ translate: "cw.tpaformR.body", with: [target.name, player.name] })
-    mform.button2({ translate: "cw.form.accept" })
-    mform.button1({ translate: "cw.form.deny" })
+    mform.button2({ translate: "cw.form.deny" })
+    mform.button1({ translate: "cw.form.accept" })
     const respone = await mform.show(player)
     if (respone.canceled) return;
     if (respone.selection == 0) {
-        player.teleport(target.location)
+        player.teleport(world.getEntity(playerId).location)
+        playerData.remove("tpa", res.selection)
     }
 }
 
 async function tpaSendForm(player) {
     const form = new ActionFormData()
     form.title({ translate: "cw.tpaform.accept" })
-    const AllPlayerIds = Util.getAllPlayerIdsSorted()
+    const AllPlayerIds = world.getAllPlayers().filter(p => p != player).map(player => player.id)
+    if (AllPlayerIds.length == 0) {
+        const mform = new MessageFormData()
+        mform.title({ translate: "cw.tpaform.accept" })
+        mform.body({ translate: "cw.tpaformS.nobodyAccept" })
+        mform.button1({ translate: "cw.form.redo" })
+        mform.button2({ translate: "cw.form.cancel" })
+        const respone = await mform.show(player)
+        if (respone.canceled) return;
+        if (respone.selection == 0) {
+            tpaForm(player)
+        }
+        return;
+    }
     for (const playerId of AllPlayerIds) {
         const playerData = playerDatas.get(playerId)
         form.button(playerData.name)
@@ -126,18 +161,26 @@ async function tpaSendForm(player) {
     const mform = new MessageFormData()
     mform.title({ translate: "cw.tpaform.accept" })
     mform.body({ translate: "cw.tpaformS.body", with: [player.name, target.name] })
-    mform.button2({ translate: "cw.form.yes" })
-    mform.button1({ translate: "cw.form.no" })
+    mform.button2({ translate: "cw.form.no" })
+    mform.button1({ translate: "cw.form.yes" })
     const respone = await mform.show(player)
     if (respone.canceled) return;
     if (respone.selection == 0) {
-        tpaSend(player, target)
+        tpaSend(player, world.getEntity(playerId))
     }
 }
 function tpaSend(player, target) {
-    const tpa = ShortPlayerData(target.id).get("tpa") || [];
+    const playerData = new ShortPlayerData(target.id)
+    const tpa = playerData.get("tpa") || [];
+    if (tpa.includes(player.id)) {
+
+        player.sendMessage({ translate: "cw.tpa.secondsend", with: [target.name] })
+        target.sendMessage({ translate: "cw.tpa.secondnotice", with: [player.name] })
+        return;
+    }
     tpa.push(player.id)
-    ShortPlayerData(target.id).set("tpa", tpa)
+    playerData.set("tpa", tpa)
     player.sendMessage({ translate: "cw.tpa.send", with: [target.name] })
     target.sendMessage({ translate: "cw.tpa.notice", with: [player.name] })
+
 }
