@@ -50,7 +50,8 @@ function DoCommand(origin) {
     const player = origin.sourceEntity;
     //関数を実行する
     system.run(() => {
-        const countryData = countryDatas.get(playerDatas.get(player.id).country);
+        const playerData = playerDatas.get(player.id)
+        const countryData = playerData.country ? countryDatas.get(playerData.country) : "none";
         Country.setting(player, countryData);
     })
 

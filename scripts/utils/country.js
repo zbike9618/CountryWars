@@ -49,6 +49,15 @@ export class Country {
         countryDatas.delete(countryData.id);
     }
     static async setting(player, countryData) {
+        if (countryData == "none") {
+            const form = new MessageFormData()
+            form.title({ translate: "cw.scform.title" })
+            form.body({ translate: "cw.scform.unjoincountry" })
+            form.button1({ translate: "cw.form.cancel" })
+            form.button2({ translate: "cw.form.cancel" })
+            form.show(player)
+            return;
+        }
         const form = new ActionFormData()
         form.title({ translate: "cw.scform.title" })
         form.button({ translate: "cw.scform.information" })
@@ -71,8 +80,15 @@ export class Country {
             this.delete(countryData)
         }
     }
+
+
+
+
+}
+class information {
     static async information(player, countryData) {
         const form = new MessageFormData()
+
         form.title({ translate: "cw.scform.information" })
         form.body({ translate: "cw.scform.informations", with: [`${countryData.name}`, `${countryData.description}`] })
         form.button1({ translate: "cw.form.redo" })
@@ -87,5 +103,51 @@ export class Country {
 
 
     }
-
+}
+class Permission {
+    static async permission(player, countryData) {
+        const form = new ActionFormData()
+        form.title({ translate: "cw.scform.permission" })
+        form.button({ translate: "cw.scform.permission.set" })
+        form.button({ translate: "cw.scform.permission.make" })
+        form.button({ translate: "cw.scform.permission.edit" })
+        const res = await form.show(player)
+        if (res.canceled) return;
+        if (res.selection == 0) {
+            this.permissionSet(player, countryData)
+        }
+        if (res.selection == 1) {
+            this.permissionMake(player, countryData)
+        }
+        if (res.selection == 2) {
+            this.permissionEdit(player, countryData)
+        }
+    }
+    static async permissionSet(player, countryData) {
+        const form = new ActionFormData()
+        form.title({ translate: "cw.scform.permission.set" })
+        form.button({ translate: "cw.scform.permission.set" })
+        form.button({ translate: "cw.scform.permission.make" })
+        form.button({ translate: "cw.scform.permission.edit" })
+        const res = await form.show(player)
+        if (res.canceled) return;
+    }
+    static async permissionMake(player, countryData) {
+        const form = new ActionFormData()
+        form.title({ translate: "cw.scform.permission.make" })
+        form.button({ translate: "cw.scform.permission.set" })
+        form.button({ translate: "cw.scform.permission.make" })
+        form.button({ translate: "cw.scform.permission.edit" })
+        const res = await form.show(player)
+        if (res.canceled) return;
+    }
+    static async permissionEdit(player, countryData) {
+        const form = new ActionFormData()
+        form.title({ translate: "cw.scform.permission.edit" })
+        form.button({ translate: "cw.scform.permission.set" })
+        form.button({ translate: "cw.scform.permission.make" })
+        form.button({ translate: "cw.scform.permission.edit" })
+        const res = await form.show(player)
+        if (res.canceled) return;
+    }
 }

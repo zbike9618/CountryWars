@@ -7,7 +7,7 @@ const playerDatas = new Dypro("player");
 world.afterEvents.playerSpawn.subscribe(ev => {
     const player = ev.player;
     const initialSpawn = ev.initialSpawn;
-    if (initialSpawn) {
+    if (initialSpawn && !player.getDynamicProperty("initial")) {
         const playerData =
         {
             id: player.id,
@@ -18,6 +18,7 @@ world.afterEvents.playerSpawn.subscribe(ev => {
         }
         playerDatas.set(player.id, playerData);
         DoInitialSpawn(player);//初期スポーンメッセージ等 
+        player.setDynamicProperty("initial", true);
     }
 })
 

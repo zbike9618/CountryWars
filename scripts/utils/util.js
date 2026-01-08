@@ -18,4 +18,9 @@ export class Util {
         const item = new ItemStack(typeId)
         return item.localizationKey;
     }
+    static addMoney(player, int) {
+        const playerData = playerDatas.get(player.id);
+        playerData.money += int;
+        playerDatas.set(player.id, playerData);
+    }
 }
