@@ -23,4 +23,17 @@ export class Util {
         playerData.money += int;
         playerDatas.set(player.id, playerData);
     }
+    static removeMoney(player, int) {
+        const playerData = playerDatas.get(player.id);
+        playerData.money -= int;
+        playerDatas.set(player.id, playerData);
+    }
+    static getMoney(player) {
+        return playerDatas.get(player.id)?.money ?? 0;
+    }
+    static setMoney(player, int) {
+        const playerData = playerDatas.get(player.id);
+        playerData.money = int;
+        playerDatas.set(player.id, playerData);
+    }
 }

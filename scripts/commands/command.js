@@ -1,3 +1,5 @@
 import "./makecountry"
 import "./tpaccept"
 import "./settingcountry"
+import "./jobs"
+import "./admin_command"
