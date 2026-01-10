@@ -45,7 +45,12 @@ export class Country {
             name: countryName,
             description: "",
             money: 0,
-            tax: 0,//税率[%]
+            tax: {
+                consumption: 0,
+                income: 0,
+                country: 0,
+                customs: 0
+            },//税率[%]
             isPeace: isPeace,
             owner: player.id,
             players: [player.id],
@@ -100,7 +105,7 @@ export class Country {
                 Money.money(player, countryData)
                 break;
             case 3:
-                this.tax(player, countryData)
+                Tax.tax(player, countryData)
                 break;
             case 4:
                 if (hasPermission(player, "permission")) {
@@ -110,6 +115,7 @@ export class Country {
                 else if (await noPermission(player)) {
                     this.setting(player, countryData)
                 }
+                break;
 
             case 5:
                 const newform = new MessageFormData()
@@ -138,7 +144,11 @@ class Information {
                 `${countryData.description}`,
                 `${playerDatas.get(countryData.owner)?.name || "Unknown"}`,
                 `${countryData.players.filter(id => id != countryData.owner).map(id => playerDatas.get(id)?.name || "Unknown").join(", ")}`,
-                `${countryData.money}`
+                `${countryData.money}`,
+                `${countryData.tax.consumption}`,
+                `${countryData.tax.income}`,
+                `${countryData.tax.country}`,
+                `${countryData.tax.customs}`
             ]
         })
         form.button1({ translate: "cw.form.redo" })
@@ -463,6 +473,22 @@ class Money {
         return true;
     }
 
+}
+class Tax {
+    static async tax(player, countryData) {
+        const form = new ModalFormData()
+        form.title({ translate: "cw.scform.tax" })
+        form.slider({ translate: "cw.scform.tax.consumption" }, 0, 100, { defaultValue: countryData.tax.consumption })
+        form.slider({ translate: "cw.scform.tax.income" }, 0, 100, { defaultValue: countryData.tax.income })
+        form.slider({ translate: "cw.scform.tax.country" }, 0, 100, { defaultValue: countryData.tax.country })
+        form.slider({ translate: "cw.scform.tax.customs" }, 0, 100, { defaultValue: countryData.tax.customs })
+        const res = await form.show(player)
+        if (res.canceled) return;
+        countryData.tax.consumption = res.formValues[0]
+        countryData.tax.income = res.formValues[1]
+        countryDatas.set(countryData.id, countryData)
+        player.sendMessage({ translate: "cw.scform.tax.success", with: [`${countryData.tax.consumption}`] })
+    }
 }
 export function hasPermission(player, permissionName) {
     const playerData = playerDatas.get(player.id)
