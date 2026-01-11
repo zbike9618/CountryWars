@@ -30,26 +30,35 @@ function heal(entity,number = 0)
 async function kaihuku(entity, number2){
     const player = entity;
     player.playSound("mob.shulker.shoot");
-    player.addEffect("slowness", 20, {
-    amplifier :255, showParticles: false
-    });
     if(number2 == 1){
         player.sendMessage("回復キット <Level 1>を使用…");
         player.runCommand("clear @s cw:kaihuku_kit1 0 1")
+        player.runCommand("inputpermission set @s jump disabled")
+        player.addEffect("slowness", 20, {
+        amplifier :255, showParticles: false
+        });
         await system.waitTicks(20)
-        heal(entity,14)
+        heal(entity,10)
+        player.runCommand("inputpermission set @s jump enabled")
     };
     if(number2 == 2){
         player.sendMessage("回復キット <Level 2>を使用…");
         player.runCommand("clear @s cw:kaihuku_kit2 0 1")
-        await system.waitTicks(20)
-        heal(entity,24)
+        player.runCommand("inputpermission set @s jump disabled")
+        player.addEffect("slowness", 40, {
+        amplifier :255, showParticles: false
+        });
+        await system.waitTicks(40)
+        heal(entity,25)
+        player.runCommand("inputpermission set @s jump enabled")
     };
     if(number2 == 3){
         player.sendMessage("回復キット <Level 3>を使用…");
         player.runCommand("clear @s cw:kaihuku_kit3 0 1")
-        await system.waitTicks(20)
+        player.runCommand("inputpermission set @s jump disabled")
+        await system.waitTicks(60)
         heal(entity,40)
+        player.runCommand("inputpermission set @s jump enabled")
     }
 }
 //スマホ使用時
